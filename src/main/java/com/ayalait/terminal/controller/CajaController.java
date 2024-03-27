@@ -26,6 +26,15 @@ public class CajaController {
 
 		return service.obtenerAperturaCajaPorFecha(fecha);
 
+	}	
+	
+	@GetMapping(value = "caja/open-day", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.CREATED)
+	public ResponseEntity<String> obtenerOpenDay( @RequestParam("fecha") String fecha)
+			throws Exception {
+
+		return service.obtenerAperturaDiaPorFecha(fecha);
+
 	}
 
 	@GetMapping(value = "historico/cambio", produces = MediaType.APPLICATION_JSON_VALUE)

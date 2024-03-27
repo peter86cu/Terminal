@@ -17,4 +17,7 @@ public interface AperturaCajaJpaSpring extends JpaRepository<AperturaCaja, Strin
 	
 	@Query(value="SELECT * FROM apertura_dia WHERE MONTH(fechaapertura) = :mes AND YEAR(fechaapertura) = :anno", nativeQuery=true)
 	List<AperturaCaja>	findAperturasMensuales(int mes, int anno);	
+	
+	@Query(value="SELECT a.id,a.estado,h.idmoneda,h.valorcompra,h.valorventa FROM apertura_dia a JOIN historico_cambio h ON (a.id=h.idapertura) WHERE a.fechaapertura = :fecha", nativeQuery=true)
+	List<Object> findAperturaDiaPorFecha(String fecha);	
 }

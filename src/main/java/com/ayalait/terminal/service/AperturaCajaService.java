@@ -23,5 +23,7 @@ public interface AperturaCajaService {
 	ResponseEntity<String> obtenerHistoricoCambioIdApertura(String id, String moneda);
 	
 	ResponseEntity<String> listadoAperturaPorMesyAnno(int mes, int anno);
+	
+	ResponseEntity<String> obtenerAperturaDiaPorFecha(String fecha);
 
 }

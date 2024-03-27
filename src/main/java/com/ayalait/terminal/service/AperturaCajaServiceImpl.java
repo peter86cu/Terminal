@@ -1,5 +1,7 @@
 package com.ayalait.terminal.service;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import com.google.gson.Gson;
 import com.ayalait.terminal.modelo.*;
 import com.ayalait.terminal.dao.*;
 import com.ayalait.terminal.util.*;
+import com.ayalait.utils.DiaAbierto;
+import com.ayalait.utils.ErrorState;
 @Service
 public class AperturaCajaServiceImpl implements AperturaCajaService {
 
@@ -21,6 +25,8 @@ public class AperturaCajaServiceImpl implements AperturaCajaService {
 
 	@Autowired
 	HistoricoCambioJPASpring daoCambio;
+	
+	ErrorState error= new ErrorState();
 
 	@Override
 	public ResponseEntity<String> abrirCaja(String caja) {
@@ -67,13 +73,17 @@ public class AperturaCajaServiceImpl implements AperturaCajaService {
 			AperturaCaja validarApertura = daoCaja.obtenerEstadoCaja(fecha);
 			System.out.println(new Gson().toJson(validarApertura));
 			if (validarApertura == null) {
-				return new ResponseEntity<String>("El día no esta abierto.", HttpStatus.BAD_REQUEST);
+				error.setCode(4005);
+				error.setMenssage("El día no esta abierto.");
+				return new ResponseEntity<String>(new Gson().toJson(error), HttpStatus.BAD_REQUEST);
 
 			} else {
 				return new ResponseEntity<String>(new Gson().toJson(validarApertura), HttpStatus.OK);
 			}
 		} catch (Exception e) {
-			return new ResponseEntity<String>(e.getCause().getCause().getMessage(), HttpStatus.NOT_ACCEPTABLE);
+			error.setCode(4005);
+			error.setMenssage(e.getCause().getCause().getMessage());
+			return new ResponseEntity<String>(new Gson().toJson(error), HttpStatus.BAD_REQUEST);
 		}
 
 	}
@@ -127,6 +137,46 @@ public class AperturaCajaServiceImpl implements AperturaCajaService {
 	
 		} catch (Exception e) {
 			return new ResponseEntity<String>(e.getCause().getCause().getMessage(), HttpStatus.NOT_ACCEPTABLE);
+
+		}
+	}
+
+	@Override
+	public ResponseEntity<String> obtenerAperturaDiaPorFecha(String fecha) {
+		try {
+			List<DiaAbierto> lstOpen= new ArrayList<DiaAbierto>();
+			Iterator<Object> lstArray = daoCaja.obtenerAperturaDiaPorFecha(fecha).iterator();
+			if(lstArray!=null) {
+				while( lstArray.hasNext()) {
+					Object[] objArray = (Object[]) lstArray.next();
+					DiaAbierto open= new DiaAbierto();
+					open.setId(objArray[0].toString());
+					open.setEstado(objArray[1].toString());
+					open.setIdmoneda(Integer.parseInt(objArray[2].toString()));
+					open.setValorcompra(Double.parseDouble(objArray[3].toString()));
+					open.setValorventa(Double.parseDouble(objArray[4].toString()));
+					lstOpen.add(open);
+				}
+				if(!lstOpen.isEmpty()) {
+					return new ResponseEntity<String>(new Gson().toJson(lstOpen), HttpStatus.OK);
+				}else {
+					error.setCode(4006);
+					error.setMenssage("No se obtuvieron datos.");
+					return new ResponseEntity<String>(new Gson().toJson(error), HttpStatus.BAD_REQUEST);
+				}
+				
+			}else {
+				error.setCode(4006);
+				error.setMenssage("No se obtuvieron datos.");
+				return new ResponseEntity<String>(new Gson().toJson(error), HttpStatus.BAD_REQUEST);
+			}
+				
+			
+	
+		} catch (Exception e) {
+			error.setCode(4006);
+			error.setMenssage(e.getCause().getCause().getMessage());
+			return new ResponseEntity<String>(new Gson().toJson(error), HttpStatus.BAD_REQUEST);
 
 		}
 	}

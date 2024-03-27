@@ -18,5 +18,7 @@ public interface AperturaCajaDao {
 	AperturaCaja recuperarAperturaCaja(String id);	
 	
 	List<AperturaCaja> listadoAperturaPorMesyAnno(int mes, int anno);
+	
+	List<Object> obtenerAperturaDiaPorFecha(String fecha);
 
 }

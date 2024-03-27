@@ -41,4 +41,11 @@ public class AperturaCajaDaoImpl implements AperturaCajaDao {
 		return dao.findAperturasMensuales(mes, anno);
 	}
 
+
+
+	@Override
+	public List<Object> obtenerAperturaDiaPorFecha(String fecha) {
+		return dao.findAperturaDiaPorFecha(fecha);
+	}
+
 }
